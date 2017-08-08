@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Time Tracker</title>
+	<link rel="stylesheet" href="popup.css" type="text/css" />
+	<script src="ChromeUsageTracker.js"></script>
+	<script src="popup.js"></script>
+</head>
+<body>
+	<header>
+		<select name="usage-duration">
+			<option value="all">All</option>
+			<option value="today">Today</option>
+			<option value="yesterday">Yesterday</option>
+			<option value="last-seven">Last 7 Days</option>
+		</select>
+
+		<div id="user"></div>	
+		<div id="status">
+			<span class="memory"></span>
+			<span class="remote-sync"></span>
+		</div>
+	</header>
+	<main>
+		<ul id="usage" class="log"></ul>
+		
+		<div class="controls">
+			<div id="clear-data">Clear Data</div>
+			<div id="export-data">Export</div>
+		</div>
+	</main>
+</body>
+</html>

@@ -1,0 +1,26 @@
+{
+	"manifest_version": 2,
+	"name": "Chrome Tracker",
+	"description": "Track your Google Chrome usage",
+	"version": "0.1.0",
+	// "default_locale": "en",
+	"browser_action": {
+		"default_icon": "icon.png",
+		"default_popup": "popup.html"
+	},
+	"background": {
+		"scripts": ["ChromeUsageTracker.js","background.js"],
+		"persistent": true
+	},
+	"author": "Micah Kamla",
+	"homepage_url": "https://github.com/mkamla/tracker",
+	"permissions": [
+		"tabs",
+		"identity",
+		"identity.email",
+		"background",
+		"idle",
+		"storage",
+		"unlimitedStorage"
+	]
+}
