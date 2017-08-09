@@ -6,15 +6,21 @@ var UI = function(callback) {
 		email: null
 	};
 
-	_this.activeModel = null;
+	_this.model = {
+		usage: {
+			active: null,
+			all: null
+		}
+	};
 
 	_this.establishUser(function(){
 		if(_this.user.id !== null){
 			_this.renderUser();
 			_this.getUsage(function(rsp){
 				if(!rsp.hasOwnProperty('error')){
-					_this.activeModel = _this.sortByDomain(rsp);
-					_this.renderUsage(_this.activeModel);
+					_this.model.usage.all = _this.sortByDomain(rsp);
+					_this.model.usage.active = _this.sortByDomain(rsp);
+					_this.renderUsage(_this.model.usage.active);
 				} else {
 					//issue error to user
 					console.log(rsp.error);
@@ -35,7 +41,7 @@ var UI = function(callback) {
 	});
 
 	document.getElementById('export-data').addEventListener('click',function(){
-		var jsonContent = "data:application/json,"+JSON.stringify(_this.activeModel);
+		var jsonContent = "data:application/json,"+JSON.stringify(_this.model.usage.active);
 
 		window.open(encodeURI(jsonContent));
 	});
@@ -166,7 +172,6 @@ UI.prototype.sortByDate = function(timeframe,data) {
 	var _this = this,
 		now = Date.now();
 
-
 	/*
 	 timestamp <number>: valid date timestamp
 	 */
@@ -194,13 +199,15 @@ UI.prototype.sortByDate = function(timeframe,data) {
 			for(var url in data[domain]){
 
 				if(data[domain][url].heartbeats.length > 0){
-					data[domain][url].heartbeats.forEach(function(val,index,array){
-						if(array[index].timeStart < start || array[index].timeStart > end){
-							array.splice(index,1);
-						} else if(array[index].timeStop < start || array[index].timeStop > end){
-							array.splice(index,1);
+					for(var event in data[domain][url].heartbeats){
+						if(data[domain][url].heartbeats[event].timeStart < start || data[domain][url].heartbeats[event].timeStart > end){
+							delete data[domain][url].heartbeats[event];
+							removeCount++;
+						} else if(data[domain][url].heartbeats[event].timeStop < start || data[domain][url].heartbeats[event].timeStop > end){
+							delete data[domain][url].heartbeats;
+							removeCount++;
 						}
-					});
+					}
 				}
 
 				if(data[domain][url].heartbeats.length === 0){
@@ -229,7 +236,6 @@ UI.prototype.sortByDate = function(timeframe,data) {
 		return sort(startOfDay(now),endOfDay(now),data);
 	} else if (timeframe === 'yesterday'){
 		//yesterday
-		console.log(timeframe);
 		return sort(startOfDay(now-86400000),endOfDay(now-86400000),data);
 	} else {
 		//all
@@ -249,25 +255,33 @@ UI.prototype.usageDurationChange = function(value){
 	
 	switch(value){
 		case 'today':
-			_this.activeModel = _this.sortByDate('today',_this.activeModel);
+			_this.model.usage.active = _this.sortByDate('today',_this.model.usage.all);
 
 			//clear area, then render
 			_this.clearUsage();
-			_this.renderUsage(_this.activeModel);
+			_this.renderUsage(_this.model.usage.active);
+			break;
+		case 'yesterday':
+			_this.model.usage.active = _this.sortByDate('yesterday',_this.model.usage.all);
+
+			//clear area, then render
+			_this.clearUsage();
+			_this.renderUsage(_this.model.usage.active);
 			break;
 		case 'last-seven':
-			_this.activeModel = _this.sortByDate('lastSevenDays',_this.activeModel);
+			_this.model.usage.active = _this.sortByDate('lastSevenDays',_this.model.usage.all);
 
 			//clear area, then render
 			_this.clearUsage();
-			_this.renderUsage(_this.activeModel);
+			_this.renderUsage(_this.model.usage.active);
 			break;
 		default:
-			_this.activeModel = _this.sortByDate('all',_this.activeModel);
+			//show all activity
+			_this.model.usage.active = _this.model.usage.all;
 
 			//clear area, then render
 			_this.clearUsage();
-			_this.renderUsage(_this.activeModel);
+			_this.renderUsage(_this.model.usage.active);
 			break;
 	}
 }
