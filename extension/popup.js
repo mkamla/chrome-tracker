@@ -170,6 +170,7 @@ UI.prototype.sortByDomain = function(data){
 
 UI.prototype.sortByDate = function(timeframe,data) {
 	var _this = this,
+		localDataCopy = JSON.parse(JSON.stringify(data)),
 		now = Date.now();
 
 	/*
@@ -210,9 +211,8 @@ UI.prototype.sortByDate = function(timeframe,data) {
 					}
 				}
 
-				if(data[domain][url].heartbeats.length === 0){
+				if(Object.keys(data[domain][url].heartbeats).length === 0){
 					removeCount++;
-					console.log('Deleted URL');
 					delete data[domain][url];
 				}
 			}
@@ -223,20 +223,18 @@ UI.prototype.sortByDate = function(timeframe,data) {
 			}
 		}
 
-		console.log('Removed '+removeCount);
-		console.log(data);
 		return data;
 	};
 
 	if(timeframe === 'lastSevenDays'){
 		//last seven days
-		return sort(startOfDay(now-(86400000*6)),endOfDay(now),data);
+		return sort(startOfDay(now-(86400000*6)),endOfDay(now),localDataCopy);
 	} else if (timeframe === 'today'){
 		//today
-		return sort(startOfDay(now),endOfDay(now),data);
+		return sort(startOfDay(now),endOfDay(now),localDataCopy);
 	} else if (timeframe === 'yesterday'){
 		//yesterday
-		return sort(startOfDay(now-86400000),endOfDay(now-86400000),data);
+		return sort(startOfDay(now-86400000),endOfDay(now-86400000),localDataCopy);
 	} else {
 		//all
 		_this.getUsage(function(rsp){
