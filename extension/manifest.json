@@ -16,8 +16,6 @@
 	"homepage_url": "https://github.com/mkamla/tracker",
 	"permissions": [
 		"tabs",
-		"identity",
-		"identity.email",
 		"background",
 		"idle",
 		"storage",

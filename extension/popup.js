@@ -13,23 +13,16 @@ var UI = function(callback) {
 		}
 	};
 
-	_this.establishUser(function(){
-		if(_this.user.id !== null){
-			_this.renderUser();
-			_this.getUsage(function(rsp){
-				if(!rsp.hasOwnProperty('error')){
-					_this.model.usage.all = _this.sortByDomain(rsp);
-					_this.model.usage.active = _this.sortByDomain(rsp);
-					_this.renderUsage(_this.model.usage.active);
-				} else {
-					//issue error to user
-					console.log(rsp.error);
-				}
-				
-			});
+	_this.getUsage(function(rsp){
+		if(!rsp.hasOwnProperty('error')){
+			_this.model.usage.all = _this.sortByDomain(rsp);
+			_this.model.usage.active = _this.sortByDomain(rsp);
+			_this.renderUsage(_this.model.usage.active);
 		} else {
-			//issue error to user: display message about lack of user sign in and tracking
+			//issue error to user
+			console.log(rsp.error);
 		}
+		
 	});
 
 	document.querySelector('select[name=usage-duration]').onchange = function(){
@@ -58,24 +51,6 @@ var UI = function(callback) {
 		}
 	});
 
-}
-
-UI.prototype.establishUser = function(callback){
-	var _this = this;
-
-	chrome.identity.getProfileUserInfo(function(profile){
-		
-		if(profile.hasOwnProperty('id') === true){
-			_this.user.id = profile.id;
-			_this.user.email = profile.email;
-
-			if(callback && typeof callback === 'function'){
-				callback();
-			}
-		} else {
-			//user is anonymous
-		}
-	});
 }
 
 UI.prototype.clearData = function() {
@@ -383,13 +358,7 @@ UI.prototype.getUsage = function(callback) {
 	});
 }
 
-UI.prototype.renderUser = function() {
-	var _this = this;
-
-	document.getElementById('user').textContent = 'Signed in as '+_this.user.email;
-}
-
-UI.prototype.renderUsage = function(data) {
+UI.prototype.renderUsage = function(data,limit) {
 	var _this = this,
 		el = document.getElementById('usage'),
 		map = _this.sortUsageByTime(data).reverse();
