@@ -201,12 +201,20 @@ UI.prototype.sortByDate = function(timeframe,data) {
 
 				if(data[domain][url].heartbeats.length > 0){
 					for(var event in data[domain][url].heartbeats){
-						if(data[domain][url].heartbeats[event].timeStart < start || data[domain][url].heartbeats[event].timeStart > end){
+						if(data[domain][url].heartbeats[event].timeStart > end){
 							delete data[domain][url].heartbeats[event];
 							removeCount++;
-						} else if(data[domain][url].heartbeats[event].timeStop < start || data[domain][url].heartbeats[event].timeStop > end){
-							delete data[domain][url].heartbeats;
+						} else if(data[domain][url].heartbeats[event].timeStop < start){
+							delete data[domain][url].heartbeats[event];
 							removeCount++;
+						} else if(data[domain][url].heartbeats[event].timeStart < start){
+							if(data[domain][url].heartbeats[event].timeStop >= start && data[domain][url].heartbeats[event].timeStop <= end){
+								data[domain][url].heartbeats[event].timeStart = start;
+							}
+						} else if(data[domain][url].heartbeats[event].timeStart >= start && data[domain][url].heartbeats[event].timeStart < end){
+							if(data[domain][url].heartbeats[event].timeStop > end){
+								data[domain][url].heartbeats[event].timeStop = end;
+							}
 						}
 					}
 				}
@@ -218,7 +226,6 @@ UI.prototype.sortByDate = function(timeframe,data) {
 			}
 
 			if(Object.keys(data[domain]).length === 0){
-				console.log('Deleted Domain');
 				delete data[domain];
 			}
 		}
